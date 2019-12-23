@@ -1,0 +1,19 @@
+This file contains the project’s copypastable boilerplate comment headers.
+
+Boilerplate for C-like languages:
+
+/****************************************************************************\
+ *                 Mersenne-Twister Algorithm 19937, 64-bit                 *
+ *                                                                          *
+ *                      Copyright © 2019 ARQADIUM, LLC                      *
+ *                           All rights reserved.                           *
+\****************************************************************************/
+
+Hash-based boilerplate (Python, POSIX shell, Makefile):
+
+##############################################################################
+##                 Mersenne-Twister Algorithm 19937, 64-bit                 ##
+##                                                                          ##
+##                      Copyright © 2019 ARQADIUM, LLC                      ##
+##                           All rights reserved.                           ##
+##############################################################################

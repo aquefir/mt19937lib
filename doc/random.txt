@@ -1,0 +1,97 @@
+Mersenne-Twister Algorithm 19937
+
+Copyright © 2019 ARQADIUM, LLC
+All rights reserved.
+
+§1. #PRNG
+----------
+
+Struct containing the state of the pseudorandom number generator. All state in
+the module, and by extension the whole library, is confined to instances of
+this struct. Created by mt_prng_init() (§2); destroyed by mt_prng_fini() (§3).
+
+§2. MT_PRNG_INIT
+-----------------
+[alloc]
+
+Creates and initialises an instance of a struct prng, returned as a pointer.
+Will return NULL only on out of memory error (malloc failure).
+
+§3. MT_PRNG_FINI
+-----------------
+[free]
+
+Finalises and frees an instance of a struct prng, passed by reference
+(pointer).
+
+§4. MT_RANGE_S32
+-----------------
+[pure]
+
+Returns a random signed 32-bit integer within the range given by min and max,
+using the 64-bit variant of the Mersenne-Twister algorithm provided by the C++
+standard library. A uniform integer distribution is used to receive the output
+of the PRNG.
+
+§5. MT_RANGE_S64
+-----------------
+[pure]
+
+Returns a random signed 64-bit integer within the range given by min and max,
+using the 64-bit variant of the Mersenne-Twister algorithm provided by the C++
+standard library. A uniform integer distribution is used to receive the output
+of the PRNG.
+
+§6. MT_RANGE_U32
+-----------------
+[pure]
+
+Returns a random unsigned 32-bit integer within the range given by min and
+max, using the 64-bit variant of the Mersenne-Twister algorithm provided by
+the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
+
+§7. MT_RANGE_U64
+-----------------
+[pure]
+
+Returns a random unsigned 64-bit integer within the range given by min and
+max, using the 64-bit variant of the Mersenne-Twister algorithm provided by
+the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
+
+§8. MT_RANDOM_S32
+------------------
+[pure]
+
+Returns a random signed 32-bit integer within the range of valid values for
+the type, using the 64-bit variant of the Mersenne-Twister algorithm provided
+by the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
+
+§9. MT_RANDOM_S64
+------------------
+[pure]
+
+Returns a random signed 64-bit integer within the range of valid values for
+the type, using the 64-bit variant of the Mersenne-Twister algorithm provided
+by the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
+
+§10. MT_RANDOM_U32
+-------------------
+[pure]
+
+Returns a random unsigned 32-bit integer within the range of valid values for
+the type, using the 64-bit variant of the Mersenne-Twister algorithm provided
+by the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
+
+§11. MT_RANDOM_U64
+-------------------
+[pure]
+
+Returns a random unsigned 64-bit integer within the range of valid values for
+the type, using the 64-bit variant of the Mersenne-Twister algorithm provided
+by the C++ standard library. A uniform integer distribution is used to receive
+the output of the PRNG.
