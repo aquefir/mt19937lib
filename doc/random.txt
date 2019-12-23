@@ -3,8 +3,8 @@ Mersenne-Twister Algorithm 19937
 Copyright © 2019 ARQADIUM, LLC
 All rights reserved.
 
-§1. #PRNG
-----------
+§1. STRUCT PRNG
+----------------
 
 Struct containing the state of the pseudorandom number generator. All state in
 the module, and by extension the whole library, is confined to instances of
