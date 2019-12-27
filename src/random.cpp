@@ -22,8 +22,7 @@ extern "C" struct mt_prng* mt_prng_init( void )
 	std::random_device rd;
 	std::mt19937_64 eng( rd( ) );
 
-	struct mt_prng* ret =
-	  (struct mt_prng*)malloc( sizeof( struct mt_prng ) );
+	struct mt_prng* ret = (struct mt_prng*)malloc( sizeof( struct mt_prng ) );
 
 	if( ret == nullptr )
 	{
@@ -51,7 +50,7 @@ extern "C" int mt_range_s32( struct mt_prng* rng, int min, int max )
 }
 
 extern "C" unsigned mt_range_u32(
-  struct mt_prng* rng, unsigned min, unsigned max )
+   struct mt_prng* rng, unsigned min, unsigned max )
 {
 	assert( rng != nullptr );
 	std::uniform_int_distribution<unsigned> dist( min, max );
@@ -60,7 +59,7 @@ extern "C" unsigned mt_range_u32(
 }
 
 extern "C" long long mt_range_s64(
-  struct mt_prng* rng, long long min, long long max )
+   struct mt_prng* rng, long long min, long long max )
 {
 	assert( rng != nullptr );
 	std::uniform_int_distribution<long long> dist( min, max );
@@ -69,7 +68,7 @@ extern "C" long long mt_range_s64(
 }
 
 extern "C" unsigned long long mt_range_u64(
-  struct mt_prng* rng, unsigned long long min, unsigned long long max )
+   struct mt_prng* rng, unsigned long long min, unsigned long long max )
 {
 	assert( rng != nullptr );
 	std::uniform_int_distribution<unsigned long long> dist( min, max );

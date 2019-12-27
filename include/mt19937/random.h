@@ -23,7 +23,7 @@ int mt_range_s32( struct mt_prng*, int, int );
 unsigned mt_range_u32( struct mt_prng*, unsigned, unsigned );
 long long mt_range_s64( struct mt_prng*, long long, long long );
 unsigned long long mt_range_u64(
-  struct mt_prng*, unsigned long long, unsigned long long );
+   struct mt_prng*, unsigned long long, unsigned long long );
 
 int mt_random_s32( struct mt_prng* );
 unsigned mt_random_u32( struct mt_prng* );
