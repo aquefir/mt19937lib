@@ -42,18 +42,11 @@ OFILES    := $(CFILES:.c=.c.o) $(CPPFILES:.cpp=.cpp.o)
 GCNOFILES := $(CFILES:.c=.c.gcno) $(CPPFILES:.cpp=.cpp.gcno)
 GCDAFILES := $(CFILES:.c=.c.gcda) $(CPPFILES:.cpp=.cpp.gcda)
 
+.PHONY: default
+
 default: debug
+
+NO_TES := 1
 
 # this defines all our usual targets
 include targets.mk
-
-clean:
-	$(RM) $(TARGETS)
-	$(RM) $(OFILES)
-	$(RM) $(GCNOFILES)
-	$(RM) $(GCDAFILES)
-
-format:
-	for _file in $(CFILES) $(HFILES) $(CPPFILES) $(HPPFILES); do \
-		$(FMT) -i -style=file $$_file ; \
-	done
