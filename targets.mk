@@ -16,17 +16,27 @@
 ## TES_CPPFILES, TES_HFILES, TES_HPPFILES, TES_GCNOFILES, TES_GCDAFILES
 
 # Add 3rd-party includes
-INCLUDES += $(patsubst %,$(3PLIBDIR)/%lib/include,$(3PLIBS)) \
-	$(3PLIBDIR)/teslib/include
+INCLUDES += $(patsubst %,$(3PLIBDIR)/%lib/include,$(3PLIBS))
+
+ifeq ($(strip $(NO_TES)),)
+INCLUDES += $(3PLIBDIR)/teslib/include
+3PLIBS += tes
+endif
+
+LIBS += pthread m
 
 # Add 3rd-party library directories
 LIBDIRS += $(patsubst %,$(3PLIBDIR)/%lib,$(3PLIBS))
 LIBS += $(3PLIBS)
 
 # Variable transformations for command invocation
-LIB := $(patsubst %,-l%,$(LIBS)) $(patsubst %,-L%,$(LIBDIRS))
+LIB := $(patsubst %,-L%,$(LIBDIRS)) $(patsubst %,-l%,$(LIBS))
+ifeq ($(CC.CUSTOM),tcc)
+INCLUDE := $(patsubst %,-I%,$(INCLUDES)) $(patsubst %,-isystem %,$(INCLUDEL))
+else
 INCLUDE := $(patsubst %,-isystem %,$(INCLUDES)) \
 	$(patsubst %,-iquote %,$(INCLUDEL))
+endif
 FWORK := $(patsubst %,-framework %,$(FWORKS))
 
 # Populated below
@@ -35,9 +45,9 @@ TARGETS :=
 TESTARGET := $(PROJECT)_test
 
 # specify all target filenames
-EXETARGET := $(PROJECT)$(EXE)
+EXETARGET := $(PROJECT)
 SOTARGET  := lib$(PROJECT).$(SO)
-ATARGET   := lib$(PROJECT).$(A)
+ATARGET   := lib$(PROJECT).a
 
 ifeq ($(strip $(EXEFILE)),1)
 TARGETS += $(EXETARGET)
@@ -59,47 +69,94 @@ endif
 
 .PHONY: debug release check cov asan clean format
 
+## Debug build
+## useful for: normal testing, valgrind, LLDB
+##
+ifeq ($(CC.CUSTOM),tcc)
+debug: CFLAGS += -UNDEBUG
+else
 debug: CFLAGS += -O0 -g3 -UNDEBUG
+endif
+debug: CXXFLAGS += -O0 -g3 -UNDEBUG
 debug: REALSTRIP := ':' ; # : is a no-op
 debug: $(TARGETS)
 
+## Release build
+## useful for: deployment
+##
+ifeq ($(CC.CUSTOM),tcc)
+release: CFLAGS += -DNDEBUG=1
+else
 release: CFLAGS += -O2 -DNDEBUG=1
+endif
+release: CXXFLAGS += -O2 -DNDEBUG=1
 release: REALSTRIP := $(STRIP) ;
 release: $(TARGETS)
 
-check: CFLAGS += -Wextra -Werror -Os -DNDEBUG=1
+## Sanity check build
+## useful for: pre-tool bug squashing
+##
+ifeq ($(CC.CUSTOM),tcc)
+check: CFLAGS += -Werror -Wunsupported -DNDEBUG=1
+else
+check: CFLAGS += -Wextra -Werror -Wno-unused-variable -Os -DNDEBUG=1
+endif
+check: CXXFLAGS += -Wextra -Werror -Wno-unused-variable -Os -DNDEBUG=1
 check: REALSTRIP := ':' ; # : is a no-op
 check: $(TARGETS)
 
-cov: CFLAGS += -O0 -g3 -UNDEBUG -fprofile-arcs -ftest-coverage
-cov: LDFLAGS += -fprofile-arcs
+## Code coverage build
+## useful for: checking coverage of test suite
+##
 cov: REALSTRIP := ':' ; # : is a no-op
+ifeq ($(CC.CUSTOM),tcc)
+cov: CFLAGS += -UNDEBUG
+cov: $(TARGETS)
+else
 ifeq ($(strip $(NO_TES)),)
-cov: CFLAGS += -DTES_BUILD=1
-cov: LDFLAGS += -L$(3PLIBDIR)/teslib
+cov: CFLAGS += -O0 -g3 -UNDEBUG -fprofile-instr-generate -fcoverage-mapping \
+	-DTES_BUILD=1
+else
+cov: -UTES_BUILD
+endif # NO_TES
+endif # CC.CUSTOM
+ifeq ($(strip $(NO_TES)),)
+cov: CXXFLAGS += -O0 -g3 -UNDEBUG -fprofile-instr-generate \
+	-fcoverage-mapping -DTES_BUILD=1
+cov: LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 cov: LIB += -ltes
 cov: $(TESTARGET)
 else
+cov: -UTES_BUILD
 cov: $(TARGETS)
-endif
+endif # NO_TES
 
-# address sanitised build for valgrind
-ifeq ($(CC),clang)
+## Address sanitised build
+## useful for: squashing memory issues
+##
+asan: REALSTRIP := ':' ; # : is a no-op
+ifeq ($(CC.CUSTOM),tcc)
+asan: CFLAGS += -UNDEBUG
+asan: $(TARGETS)
+else
+ifeq ($(strip $(NO_TES)),)
 asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -O1 -g3 \
 	-fno-common -fno-optimize-sibling-calls -fsanitize=undefined \
-	-fno-sanitize-recover=all
+	-fno-sanitize-recover=all -DTES_BUILD=1
 else
 asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -O1 -g \
-	-fno-common -fno-optimize-sibling-calls
-endif
-asan: LDFLAGS += -fsanitize=address
-asan: REALSTRIP := ':' ; # : is a no-op
+	-fno-common -fno-optimize-sibling-calls -UTES_BUILD
+endif # NO_TES
+endif # CC.CUSTOM
 ifeq ($(strip $(NO_TES)),)
-asan: CFLAGS += -DTES_BUILD=1
-asan: LDFLAGS += -L$(3PLIBDIR)/teslib
+asan: CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer -O1 -g3 \
+	-fno-common -fno-optimize-sibling-calls -fsanitize=undefined \
+	-fno-sanitize-recover=all -DTES_BUILD=1
+#asan: LDFLAGS += -fsanitize=address -L$(3PLIBDIR)/teslib
 asan: LIB += -ltes
 asan: $(TESTARGET)
 else
+asan: CXXFLAGS += -UTES_BUILD
 asan: $(TARGETS)
 endif
 
@@ -116,23 +173,23 @@ $(ATARGET): $(OFILES)
 
 # Shared library builds
 $(SOTARGET): $(OFILES)
-	$(CCLD) $(LDFLAGS) -shared -o $@ $(LIB) $^
+	$(CCLD) $(LDFLAGS) -shared -o $@ $^ $(LIB)
 	$(REALSTRIP) -s $^
 
 # Executable builds
 $(EXETARGET): $(OFILES)
-	$(CCLD) $(LDFLAGS) -o $@ $(LIB) $^
+	$(CCLD) $(LDFLAGS) -o $@ $^ $(LIB)
 	$(REALSTRIP) -s $^
 
 $(TESTARGET): $(OFILES) $(TES_OFILES)
-	$(CCLD) $(LDFLAGS) -o $@ $(LIB) $^
+	$(CCLD) $(LDFLAGS) -o $@ $^ $(LIB)
 
 DSYMS := $(patsubst %,%.dSYM,$(TARGETS)) $(patsubst %,%.dSYM,$(TESTARGET))
 
 clean:
 	$(RM) $(TARGETS)
 	$(RM) $(TESTARGET)
-	$(RM)r $(DSYMS)
+	$(RM) -r $(DSYMS)
 	$(RM) $(OFILES)
 	$(RM) $(GCNOFILES)
 	$(RM) $(GCDAFILES)
@@ -140,7 +197,11 @@ clean:
 	$(RM) $(TES_GCNOFILES)
 	$(RM) $(TES_GCDAFILES)
 
-format:
-	for _file in $(CFILES) $(HFILES) $(CPPFILES) $(HPPFILES); do \
+ifeq ($(strip $(NO_TES)),)
+format: $(TES_CFILES) $(TES_HFILES) $(TES_CPPFILES) $(TES_HPPFILES)
+endif
+format: $(CFILES) $(HFILES) $(CPPFILES) $(HPPFILES)
+	for _file in $^; do \
 		$(FMT) -i -style=file $$_file ; \
 	done
+	unset _file
