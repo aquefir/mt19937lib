@@ -1,8 +1,8 @@
 /****************************************************************************\
  *                 Mersenne-Twister Algorithm 19937, 64-bit                 *
  *                                                                          *
- *                      Copyright © 2019 ARQADIUM, LLC                      *
- *                           All rights reserved.                           *
+ *                    Copyright © 2019-2020 ARQADIUM LLC                    *
+ *                       Released under BSD-2-Clause.                       *
 \****************************************************************************/
 
 #ifndef INC__MT19937_RANDOM_H

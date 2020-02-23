@@ -1,7 +1,8 @@
 Mersenne-Twister Algorithm 19937 Build Instructions
 
 Written by Alexander Nicholi
-Copyright © 2019 Arqadium, LLC. All rights reserved.
+Copyright © 2019-2020 ARQADIUM LLC
+Released under BSD-2-Clause.
 
 §1. PREREQUISITES
 ------------------
