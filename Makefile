@@ -1,52 +1,52 @@
 ##############################################################################
 ##                 Mersenne-Twister Algorithm 19937, 64-bit                 ##
 ##                                                                          ##
-##                    Copyright © 2019-2020 ARQADIUM LLC                    ##
+##                      Copyright © 2019-2020 Aquefir.                      ##
 ##                       Released under BSD-2-Clause.                       ##
 ##############################################################################
 
-include base.mk
+include etc/base.mk
 
 PROJECT := mt19937
-EXEFILE :=
-SOFILE  :=
-AFILE   := 1
 
+# put a ‘1’ for the desired target types to compile
+SOFILE :=
+AFILE  := 1
+
+# space-separated path list for #includes
 # <system> includes
 INCLUDES := include
 # "local" includes
 INCLUDEL :=
 
-# libraries
-LIBS    :=
-LIBDIRS :=
+# space-separated library name list
+LIBS      :=
+LIBDIRS   :=
 
-# frameworks (macOS only)
+# frameworks (macOS target only)
 FWORKS :=
 
-ifeq ($(UNAME),Windows)
-	LIBS     += mingw32
-	LIBDIRS  += $(USERPROFILE)/sysroot/lib
-	INCLUDES += $(USERPROFILE)/sysroot/include
-endif
-ifeq ($(UNAME),Linux)
-	LIBS     += m pthread
-endif
+# ‘3P’ are in-tree 3rd-party dependencies
+# 3PLIBDIR is the base directory
+# 3PLIBS is the folder names in the base directory for each library
+3PLIBDIR := 3rdparty
+3PLIBS   :=
 
-CFILES    :=
-HFILES    := include/mt19937/random.h
-CPPFILES  := src/random.cpp
-HPPFILES  :=
-OFILES    := $(CFILES:.c=.c.o) $(CPPFILES:.cpp=.cpp.o)
-# address-sanitisation metadata
-GCNOFILES := $(CFILES:.c=.c.gcno) $(CPPFILES:.cpp=.cpp.gcno)
-GCDAFILES := $(CFILES:.c=.c.gcda) $(CPPFILES:.cpp=.cpp.gcda)
+# sources
+CFILES   :=
+HFILES   := \
+	include/mt19937/random.h
+CPPFILES := \
+	src/random.cpp
+HPPFILES :=
 
-.PHONY: default
-
-default: debug
+# test suite sources
+TES_CFILES   :=
+TES_HFILES   :=
+TES_CPPFILES :=
+TES_HPPFILES :=
 
 NO_TES := 1
 
 # this defines all our usual targets
-include targets.mk
+include etc/targets.mk

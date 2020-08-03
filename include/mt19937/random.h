@@ -1,12 +1,12 @@
 /****************************************************************************\
  *                 Mersenne-Twister Algorithm 19937, 64-bit                 *
  *                                                                          *
- *                    Copyright © 2019-2020 ARQADIUM LLC                    *
+ *                      Copyright © 2019-2020 Aquefir.                      *
  *                       Released under BSD-2-Clause.                       *
 \****************************************************************************/
 
-#ifndef INC__MT19937_RANDOM_H
-#define INC__MT19937_RANDOM_H
+#ifndef INC_API__MT19937_RANDOM_H
+#define INC_API__MT19937_RANDOM_H
 
 /* STATE MODULE */
 
@@ -34,4 +34,4 @@ unsigned long long mt_random_u64( struct mt_prng* );
 }
 #endif
 
-#endif /* INC__MT19937_RANDOM_H */
+#endif /* INC_API__MT19937_RANDOM_H */
