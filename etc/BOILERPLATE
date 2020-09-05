@@ -3,7 +3,7 @@ This file contains the project’s copypastable boilerplate comment headers.
 Boilerplate for C-like languages:
 
 /****************************************************************************\
- *                 Mersenne-Twister Algorithm 19937, 64-bit                 *
+ *                 Mersenne-Twister Algorithm 19937, 32-bit                 *
  *                                                                          *
  *                      Copyright © 2019-2020 Aquefir.                      *
  *                       Released under BSD-2-Clause.                       *
@@ -12,7 +12,7 @@ Boilerplate for C-like languages:
 Hash-based boilerplate (Python, POSIX shell, Makefile):
 
 ##############################################################################
-##                 Mersenne-Twister Algorithm 19937, 64-bit                 ##
+##                 Mersenne-Twister Algorithm 19937, 32-bit                 ##
 ##                                                                          ##
 ##                      Copyright © 2019-2020 Aquefir.                      ##
 ##                       Released under BSD-2-Clause.                       ##

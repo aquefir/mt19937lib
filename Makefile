@@ -1,5 +1,5 @@
 ##############################################################################
-##                 Mersenne-Twister Algorithm 19937, 64-bit                 ##
+##                 Mersenne-Twister Algorithm 19937, 32-bit                 ##
 ##                                                                          ##
 ##                      Copyright © 2019-2020 Aquefir.                      ##
 ##                       Released under BSD-2-Clause.                       ##
@@ -30,14 +30,14 @@ FWORKS :=
 # 3PLIBDIR is the base directory
 # 3PLIBS is the folder names in the base directory for each library
 3PLIBDIR := 3rdparty
-3PLIBS   :=
+3PLIBS   := uni
 
 # sources
-CFILES   :=
+CFILES   := \
+	src/random.c
 HFILES   := \
 	include/mt19937/random.h
-CPPFILES := \
-	src/random.cpp
+CPPFILES :=
 HPPFILES :=
 
 # test suite sources

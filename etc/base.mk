@@ -40,158 +40,9 @@ UNAME := $(shell uname -s)
 # User can specify TP={Win32,Win64,GBA} at the command line
 TP ?= $(UNAME)
 
-## Specify the default host variables
-## form: <var>.<host>[.<target>]
-##
-
-ifeq ($(strip $(TC)),llvm)
-CC.DARWIN       := /usr/local/opt/llvm/bin/clang # brew LLVM
-else
-CC.DARWIN       := /usr/bin/clang # Xcode
-endif
-ifeq ($(strip $(TC)),gnu)
-CC.LINUX        := /usr/bin/gcc
-else
-CC.LINUX        := /usr/bin/clang
-endif
-CC.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-gcc
-CC.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-gcc
-CC.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-gcc
-CC.LINUX.WIN64  := /usr/bin/i686-w64-mingw32-gcc
-CC.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc
-CC.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc
-
-ifeq ($(strip $(TC)),llvm)
-CXX.DARWIN       := /usr/local/opt/llvm/bin/clang++ # brew LLVM
-else
-CXX.DARWIN       := /usr/bin/clang++ # Xcode
-endif
-ifeq ($(strip $(TC)),gnu)
-CXX.LINUX        := /usr/bin/g++
-else
-CXX.LINUX        := /usr/bin/clang++
-endif
-CXX.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-g++
-CXX.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-g++
-CXX.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-g++
-CXX.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-g++
-CXX.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-g++
-CXX.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-g++
-
-ifeq ($(strip $(TC)),llvm)
-AR.DARWIN := /usr/local/opt/llvm/bin/llvm-ar # brew LLVM
-else
-AR.DARWIN := /usr/bin/ar # Xcode
-endif
-AR.LINUX        := /usr/bin/ar
-AR.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-ar
-AR.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-ar
-AR.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-ar
-AR.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-ar
-AR.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-ar
-AR.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-ar
-
-ifeq ($(strip $(TC)),llvm)
-STRIP.DARWIN       := /usr/local/opt/llvm/bin/llvm-strip # brew LLVM
-else
-STRIP.DARWIN       := /usr/bin/strip # Xcode
-endif
-STRIP.LINUX        := /usr/bin/strip
-STRIP.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-strip
-STRIP.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-strip
-STRIP.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-strip
-STRIP.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-strip
-STRIP.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-strip
-STRIP.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-strip
-
-## Specify the default target variables
-## form: <var>.<target>
-##
-
-SO.DARWIN := dylib
-SO.LINUX  := so
-SO.WIN32  := dll
-SO.WIN64  := dll
-SO.GBA    := nosharedlibsforgba # deliberate. check urself
-
-CFLAGS.COMMON          := -pipe
-CFLAGS.GCOMMON         := -fPIC -ansi -Wpedantic -x c -frandom-seed=69420
-CFLAGS.GCOMMON.DEBUG   := -O0 -g3 -Wall -Wpedantic
-CFLAGS.GCOMMON.RELEASE := -O2 -w
-CFLAGS.GCOMMON.CHECK   := -Wextra -Werror -Wno-unused-variable
-ifeq ($(strip $(TC)),llvm)
-CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
-else ifeq ($(strip $(TC)),xcode)
-CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
-else
-CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-instr-generate \
-	-fcoverage-mapping
-endif
-CFLAGS.GCOMMON.ASAN    := -O1 -g3 -fsanitize=address -fno-omit-frame-pointer
-CFLAGS.GCOMMON.UBSAN   := -O1 -g3 -fsanitize=undefined \
-	-fno-omit-frame-pointer
-CFLAGS.DARWIN := -march=ivybridge -mtune=skylake
-CFLAGS.LINUX  := -march=sandybridge -mtune=skylake
-CFLAGS.WIN32  := -march=sandybridge -mtune=skylake
-CFLAGS.WIN64  := -march=sandybridge -mtune=skylake
-CFLAGS.GBA    := -march=armv4t -mcpu=arm7tdmi -mthumb-interwork
-
-CXXFLAGS.COMMON := -pipe -fPIC -std=c++11 -x c++ -frandom-seed=69420
-CXXFLAGS.COMMON.DEBUG   := -O0 -g3 -Wall -Wpedantic
-CXXFLAGS.COMMON.RELEASE := -O2 -w
-CXXFLAGS.COMMON.CHECK   := -Wextra -Werror -Wno-unused-variable
-ifeq ($(strip $(TC)),llvm)
-CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
-else ifeq ($(strip $(TC)),xcode)
-CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
-else
-CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-instr-generate \
-	-fcoverage-mapping
-endif
-CXXFLAGS.COMMON.ASAN    := -O1 -g3 -fsanitize=address -fno-omit-frame-pointer
-CXXFLAGS.COMMON.UBSAN   := -O1 -g3 -fsanitize=undefined \
-	-fno-omit-frame-pointer
-CXXFLAGS.DARWIN := -march=ivybridge -mtune=skylake
-CXXFLAGS.LINUX  := -march=sandybridge -mtune=skylake
-CXXFLAGS.WIN32  := -march=sandybridge -mtune=skylake
-CXXFLAGS.WIN64  := -march=sandybridge -mtune=skylake
-CXXFLAGS.GBA    := -march=armv4t -mcpu=arm7tdmi -mthumb-interwork
-
-LDFLAGS       := -fPIE
-LDFLAGS.COV   :=
-LDFLAGS.ASAN  := -fsanitize=address -fno-omit-frame-pointer
-LDFLAGS.UBSAN := -fsanitize=undefined
-ifeq ($(strip $(TC)),llvm)
-LDFLAGS.COV += -fprofile-arcs -ftest-coverage
-else ifeq ($(strip $(TC)),xcode)
-LDFLAGS.COV += -fprofile-arcs -ftest-coverage
-else
-LDFLAGS.COV += -fprofile-instr-generate -fcoverage-mapping
-endif
-
-# Initialise $(TROOT)
-TROOT.DARWIN.WIN32 := /usr/local/i686-w64-mingw32
-TROOT.DARWIN.WIN64 := /usr/local/x86_64-w64-mingw32
-TROOT.DARWIN.GBA   := /opt/devkitpro/devkitARM
-TROOT.DARWIN       := /usr
-TROOT.LINUX.WIN32  := /usr/i686-w64-mingw32
-TROOT.LINUX.WIN64  := /usr/x86_64-w64-mingw32
-TROOT.LINUX.GBA    := /opt/devkitpro/devkitARM
-TROOT.LINUX        := /usr
-
-# These are config.h synthetics to tell code about its particularities
-CDEFS.DARWIN := DARWIN LILENDIAN AMD64
-CDEFS.LINUX  := LINUX LILENDIAN
-ifneq ($(strip $(shell uname -a | grep x86_64)),)
-CDEFS.LINUX += AMD64
-else ifneq ($(strip $(shell uname -a | grep i386)),)
-CDEFS.LINUX += IA32
-else
-$(error Linux is not supported outside of x86.)
-endif
-CDEFS.WIN32  := WINDOWS WIN32 LILENDIAN IA32
-CDEFS.WIN64  := WINDOWS WIN64 LILENDIAN AMD64
-CDEFS.GBA    := GBA ARMV4T LILENDIAN
+## Toolchain
+# This must be resolved before the rest, as all the other environment
+# variables depend on its value
 
 TC.DARWIN := llvm
 TC.LINUX  := gnu
@@ -242,10 +93,202 @@ else
 $(error Unsupported host platform "$(UNAME)")
 endif # $(UNAME)
 
+TC ?= $(TC.$(tsuf))
+
+## Specify the default host variables
+## form: <var>.<host>[.<target>]
+##
+
+ifeq ($(strip $(TC)),llvm)
+CC.DARWIN       := /usr/local/opt/llvm/bin/clang # brew LLVM
+else
+CC.DARWIN       := /usr/bin/clang # Xcode
+endif
+ifeq ($(strip $(TC)),gnu)
+CC.LINUX        := /usr/bin/gcc
+else
+CC.LINUX        := /usr/bin/clang
+endif
+CC.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-gcc
+CC.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-gcc
+CC.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-gcc
+CC.LINUX.WIN64  := /usr/bin/i686-w64-mingw32-gcc
+CC.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc
+CC.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc
+
+ifeq ($(strip $(TC)),llvm)
+AS.DARWIN       := sh -c 'cat' # dummy
+else
+AS.DARWIN       := sh -c 'cat'
+endif
+AS.LINUX        := /usr/bin/as
+AS.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-as
+AS.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-as
+AS.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-as
+AS.LINUX.WIN64  := /usr/bin/i686-w64-mingw32-as
+AS.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-as
+AS.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-as
+
+ifeq ($(strip $(TC)),llvm)
+CXX.DARWIN       := /usr/local/opt/llvm/bin/clang++ # brew LLVM
+else
+CXX.DARWIN       := /usr/bin/clang++ # Xcode
+endif
+ifeq ($(strip $(TC)),gnu)
+CXX.LINUX        := /usr/bin/g++
+else
+CXX.LINUX        := /usr/bin/clang++
+endif
+CXX.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-g++
+CXX.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-g++
+CXX.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-g++
+CXX.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-g++
+CXX.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-g++
+CXX.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-g++
+
+ifeq ($(strip $(TC)),llvm)
+AR.DARWIN := /usr/local/opt/llvm/bin/llvm-ar # brew LLVM
+else
+AR.DARWIN := /usr/bin/ar # Xcode
+endif
+AR.LINUX        := /usr/bin/ar
+AR.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-ar
+AR.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-ar
+AR.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-ar
+AR.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-ar
+AR.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-ar
+AR.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-ar
+
+ifeq ($(strip $(TC)),llvm)
+OCPY.DARWIN       := /usr/local/opt/llvm/bin/llvm-objcopy # brew LLVM
+else
+OCPY.DARWIN       := /usr/bin/objcopy # Xcode
+endif
+OCPY.LINUX        := /usr/bin/objcopy
+OCPY.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-objcopy
+OCPY.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-objcopy
+OCPY.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-objcopy
+OCPY.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-objcopy
+OCPY.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-objcopy
+OCPY.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-objcopy
+
+ifeq ($(strip $(TC)),llvm)
+STRIP.DARWIN       := /usr/local/opt/llvm/bin/llvm-strip # brew LLVM
+else
+STRIP.DARWIN       := /usr/bin/strip # Xcode
+endif
+STRIP.LINUX        := /usr/bin/strip
+STRIP.DARWIN.WIN32 := /usr/local/bin/i686-w64-mingw32-strip
+STRIP.LINUX.WIN32  := /usr/bin/i686-w64-mingw32-strip
+STRIP.DARWIN.WIN64 := /usr/local/bin/x86_64-w64-mingw32-strip
+STRIP.LINUX.WIN64  := /usr/bin/x86_64-w64-mingw32-strip
+STRIP.DARWIN.GBA   := /opt/devkitpro/devkitARM/bin/arm-none-eabi-strip
+STRIP.LINUX.GBA    := /opt/devkitpro/devkitARM/bin/arm-none-eabi-strip
+
+## Specify the default target variables
+## form: <var>.<target>
+##
+
+SO.DARWIN := dylib
+SO.LINUX  := so
+SO.WIN32  := dll
+SO.WIN64  := dll
+SO.GBA    := nosharedlibsforgba # deliberate. check urself
+
+CFLAGS.COMMON          := -pipe
+CFLAGS.GCOMMON         := -fPIC -ansi -Wpedantic -x c -frandom-seed=69420
+CFLAGS.GCOMMON.DEBUG   := -O0 -g3 -Wall -Wpedantic
+CFLAGS.GCOMMON.RELEASE := -O2 -w
+CFLAGS.GCOMMON.CHECK   := -Wextra -Werror -Wno-unused-variable
+ifeq ($(strip $(TC)),llvm)
+CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
+else ifeq ($(strip $(TC)),xcode)
+CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
+else
+CFLAGS.GCOMMON.COV     := -O1 -g3 -fprofile-instr-generate \
+	-fcoverage-mapping
+endif
+CFLAGS.GCOMMON.ASAN    := -O1 -g3 -fsanitize=address -fno-omit-frame-pointer
+CFLAGS.GCOMMON.UBSAN   := -O1 -g3 -fsanitize=undefined \
+	-fno-omit-frame-pointer
+CFLAGS.DARWIN := -march=ivybridge -mtune=skylake
+CFLAGS.LINUX  := -march=sandybridge -mtune=skylake
+CFLAGS.WIN32  := -march=sandybridge -mtune=skylake
+CFLAGS.WIN64  := -march=sandybridge -mtune=skylake
+CFLAGS.GBA    := -march=armv4t -mcpu=arm7tdmi -mthumb-interwork \
+	-Wno-builtin-declaration-mismatch
+
+ASFLAGS.COMMON :=
+ASFLAGS.DARWIN :=
+ASFLAGS.LINUX  :=
+ASFLAGS.WIN32  :=
+ASFLAGS.WIN64  :=
+ASFLAGS.GBA    := -march=armv4t -mcpu=arm7tdmi -mthumb-interwork -EL
+
+CXXFLAGS.COMMON := -pipe -fPIC -std=c++11 -x c++ -frandom-seed=69420
+CXXFLAGS.COMMON.DEBUG   := -O0 -g3 -Wall -Wpedantic
+CXXFLAGS.COMMON.RELEASE := -O2 -w
+CXXFLAGS.COMMON.CHECK   := -Wextra -Werror -Wno-unused-variable
+ifeq ($(strip $(TC)),llvm)
+CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
+else ifeq ($(strip $(TC)),xcode)
+CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-arcs -ftest-coverage
+else
+CXXFLAGS.COMMON.COV     := -O1 -g3 -fprofile-instr-generate \
+	-fcoverage-mapping
+endif
+CXXFLAGS.COMMON.ASAN    := -O1 -g3 -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS.COMMON.UBSAN   := -O1 -g3 -fsanitize=undefined \
+	-fno-omit-frame-pointer
+CXXFLAGS.DARWIN := -march=ivybridge -mtune=skylake
+CXXFLAGS.LINUX  := -march=sandybridge -mtune=skylake
+CXXFLAGS.WIN32  := -march=sandybridge -mtune=skylake
+CXXFLAGS.WIN64  := -march=sandybridge -mtune=skylake
+CXXFLAGS.GBA    := -march=armv4t -mcpu=arm7tdmi -mthumb-interwork \
+	-Wno-builtin-declaration-mismatch
+
+LDFLAGS       := -fPIE
+LDFLAGS.COV   :=
+LDFLAGS.ASAN  := -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS.UBSAN := -fsanitize=undefined
+ifeq ($(strip $(TC)),llvm)
+LDFLAGS.COV += -fprofile-arcs -ftest-coverage
+else ifeq ($(strip $(TC)),xcode)
+LDFLAGS.COV += -fprofile-arcs -ftest-coverage
+else
+LDFLAGS.COV += -fprofile-instr-generate -fcoverage-mapping
+endif
+
+# Initialise $(TROOT)
+TROOT.DARWIN.WIN32 := /usr/local/i686-w64-mingw32
+TROOT.DARWIN.WIN64 := /usr/local/x86_64-w64-mingw32
+TROOT.DARWIN.GBA   := /opt/devkitpro/devkitARM
+TROOT.DARWIN       := /usr
+TROOT.LINUX.WIN32  := /usr/i686-w64-mingw32
+TROOT.LINUX.WIN64  := /usr/x86_64-w64-mingw32
+TROOT.LINUX.GBA    := /opt/devkitpro/devkitARM
+TROOT.LINUX        := /usr
+
+# These are config.h synthetics to tell code about its particularities
+CDEFS.DARWIN := DARWIN LILENDIAN AMD64
+CDEFS.LINUX  := LINUX LILENDIAN
+ifneq ($(strip $(shell uname -a | grep x86_64)),)
+CDEFS.LINUX += AMD64
+else ifneq ($(strip $(shell uname -a | grep i386)),)
+CDEFS.LINUX += IA32
+else
+$(error Linux is not supported outside of x86.)
+endif
+CDEFS.WIN32  := WINDOWS WIN32 LILENDIAN IA32
+CDEFS.WIN64  := WINDOWS WIN64 LILENDIAN AMD64
+CDEFS.GBA    := GBA ARMV4T LILENDIAN
+
 ifeq ($(strip $(TP)),Win32)
 EXE := .exe
 else ifeq ($(strip $(TP)),Win64)
 EXE := .exe
+else ifeq ($(strip $(TP)),GBA)
+EXE := .elf
 else
 EXE :=
 endif # $(TP)
@@ -254,14 +297,17 @@ endif # $(TP)
 ##
 
 SO := $(SO.$(tsuf))
-TC ?= $(TC.$(tsuf))
 
 CC.DEFAULT    := $(CC.$(suf))
 CC.CUSTOM     := $(CC)
+AS.DEFAULT    := $(AS.$(suf))
+AS.CUSTOM     := $(AS)
 CXX.DEFAULT   := $(CXX.$(suf))
 CXX.CUSTOM    := $(CXX)
 AR.DEFAULT    := $(AR.$(suf))
 AR.CUSTOM     := $(AR)
+OCPY.DEFAULT    := $(OCPY.$(suf))
+OCPY.CUSTOM     := $(OCPY)
 STRIP.DEFAULT := $(STRIP.$(suf))
 STRIP.CUSTOM  := $(STRIP)
 
@@ -270,6 +316,7 @@ CFLAGS   := $(CFLAGS.COMMON) -std=c89
 else
 CFLAGS   := $(CFLAGS.GCOMMON) $(CFLAGS.$(tsuf))
 endif # $(CC.CUSTOM)
+ASFLAGS  := $(ASFLAGS.COMMON) $(ASFLAGS.$(tsuf))
 CXXFLAGS := $(CXXFLAGS.COMMON) $(CXXFLAGS.$(tsuf))
 #LDFLAGS
 ARFLAGS  := -rcs
@@ -299,6 +346,15 @@ else
 CC := $(CC.CUSTOM)
 endif # $(origin CC)
 
+ifeq ($(origin AS),undefined)
+AS := $(AS.DEFAULT)
+else ifeq ($(origin AS),default)
+AS := $(AS.DEFAULT)
+else
+# environment [override], file, command line, override, automatic
+AS := $(AS.CUSTOM)
+endif # $(origin AS)
+
 ifeq ($(origin CXX),undefined)
 CXX := $(CXX.DEFAULT)
 else ifeq ($(origin CXX),default)
@@ -317,6 +373,15 @@ else
 AR := $(AR.CUSTOM)
 endif # $(origin AR)
 
+ifeq ($(origin OCPY),undefined)
+OCPY := $(OCPY.DEFAULT)
+else ifeq ($(origin OCPY),default)
+OCPY := $(OCPY.DEFAULT)
+else
+# environment [override], file, command line, override, automatic
+OCPY := $(OCPY.CUSTOM)
+endif # $(origin OCPY)
+
 ifeq ($(origin STRIP),undefined)
 STRIP := $(STRIP.DEFAULT)
 else ifeq ($(origin STRIP),default)
@@ -325,6 +390,8 @@ else
 # environment [override], file, command line, override, automatic
 STRIP := $(STRIP.CUSTOM)
 endif # $(origin STRIP)
+
+FIX := gbafix
 
 # Deterministic build flags, for both clang and GCC
 SOURCE_DATE_EPOCH := 0
@@ -366,8 +433,10 @@ export TC
 export SO
 export EXE
 export CC
+export AS
 export CXX
 export AR
+export OCPY
 export STRIP
 export CFLAGS
 export CFLAGS.COMMON
@@ -378,6 +447,8 @@ export CFLAGS.GCOMMON.CHECK
 export CFLAGS.GCOMMON.COV
 export CFLAGS.GCOMMON.ASAN
 export CFLAGS.GCOMMON.UBSAN
+export ASFLAGS
+export ASFLAGS.COMMON
 export CXXFLAGS
 export CXXFLAGS.COMMON
 export CXXFLAGS.COMMON.DEBUG
